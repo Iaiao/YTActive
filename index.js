@@ -89,7 +89,7 @@ class Comment {
      * @returns {Promise<boolean>} true = subscribed, false = not subscribed, rejects on users with private subscriptions
      */
     isSubscribed(to_channel, counter) {
-        if(!counter[to_channel]) counter[to_channel] = {}
+        if(!counter.subscribed[to_channel]) counter.subscribed[to_channel] = {}
         return new Promise((resolve, reject) => {
             if(counter.subscribed[to_channel]?.[this.author_id] === undefined) {
                 counter.client.subscriptions.list({
@@ -99,9 +99,11 @@ class Comment {
                     maxResults: 1
                 }).then(response => {
                     counter.subscribed[to_channel][this.author_id] = response.data.items.length > 0
+                    resolve(counter.subscribed[to_channel][this.author_id])
                 }).catch(err => reject(err))
+            } else {
+                resolve(counter.subscribed[to_channel][this.author_id])
             }
-            resolve(counter.subscribed[to_channel][this.author_id])
         })
     }
 }
