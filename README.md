@@ -5,6 +5,7 @@ This tool is created for youtubers (or analysts) who want to find out their most
 The concept of this thing is points. You will create your own comment evaluator like `if comment contains "I like it" give +5 points, +1 point per word, +2 points per comment like, multiply everything by 2 if the user is subscribed`.
 
 ## Usage
+```js
 let a = new UserCounter(process.env.YTA_TOKEN, comment => new Promise((resolve, _reject) => {
     let n = comment.text.split(" ").length * 1 + comment.like_count * 2
     comment.isSubscribed("your_channel_id", a).then(subscribed => {
@@ -20,3 +21,4 @@ a.count("your_channel_id").then(comments => {
     })
     console.log(entries)
 })
+```
