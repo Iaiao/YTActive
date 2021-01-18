@@ -1,6 +1,6 @@
 {
   "name": "ytactive",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Find your most active subscribers",
   "main": "index.js",
   "scripts": {
