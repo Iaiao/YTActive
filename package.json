@@ -1,0 +1,25 @@
+{
+  "name": "ytactive",
+  "version": "1.0.0",
+  "description": "Find your most active subscribers",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Iaiao/YTActive.git"
+  },
+  "keywords": [
+    "youtube"
+  ],
+  "author": "Iaiao",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/Iaiao/YTActive/issues"
+  },
+  "homepage": "https://github.com/Iaiao/YTActive#readme",
+  "dependencies": {
+    "googleapis": "^67.0.0"
+  }
+}
