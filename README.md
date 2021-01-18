@@ -10,7 +10,7 @@ const UserCounter = require("ytactive")
 
 let counter = new UserCounter(process.env.YTA_TOKEN, comment => new Promise((resolve, _reject) => {
     let n = comment.text.split(" ").length * 1 + comment.like_count * 2
-    comment.isSubscribed("your_channel_id", a).then(subscribed => {
+    comment.isSubscribed("your_channel_id", counter).then(subscribed => {
         resolve(n * (subscribed ? 2 : 1))
     }).catch(_ => resolve(n))
 }))
