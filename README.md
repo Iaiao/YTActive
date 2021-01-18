@@ -6,13 +6,15 @@ The concept of this thing is points. You will create your own comment evaluator 
 
 ## Usage
 ```js
-let a = new UserCounter(process.env.YTA_TOKEN, comment => new Promise((resolve, _reject) => {
+const UserCounter = require("ytactive")
+
+let counter = new UserCounter(process.env.YTA_TOKEN, comment => new Promise((resolve, _reject) => {
     let n = comment.text.split(" ").length * 1 + comment.like_count * 2
     comment.isSubscribed("your_channel_id", a).then(subscribed => {
         resolve(n * (subscribed ? 2 : 1))
     }).catch(_ => resolve(n))
 }))
-a.count("your_channel_id").then(comments => {
+counter.count("your_channel_id").then(comments => {
     // { "commenter_channel_id": <points> }.
     // Let's sort it so we will see the most active commenters.
     let entries = Object.entries(comments)
