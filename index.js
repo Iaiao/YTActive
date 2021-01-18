@@ -5,7 +5,7 @@ class UserCounter {
 
     /**
      * @param {string} api_key API key
-     * @param {function(Comment): Number} evaluate comment evaluation function
+     * @param {function(Comment): Promise<number> | number} evaluate comment evaluation function
      */
     constructor(api_key, evaluate) {
         this.client = google.youtube({
@@ -13,23 +13,22 @@ class UserCounter {
             auth: api_key
         })
         this.evaluate = evaluate
+        this.subscribed = {}
     }
 
     /**
      * Counts all comments
      * @param {string} channel_id
-     * @returns {import(Promise<Object>}
+     * @returns {Promise<Object>}
      */
-    count(channel_id) {
-        return this.fetchComments(channel_id)
-            .then(comments => {
-                let map = {}
-                comments.forEach(comment => {
-                    if(map[comment.author_id] === undefined) map[comment.author_id] = 0
-                    map[comment.author_id] += this.evaluate(comment)
-                })
-                return map
-            })
+    async count(channel_id) {
+        const comments = await this.fetchComments(channel_id)
+        let map = {}
+        await Promise.all(comments.map(async comment => {
+            if (map[comment.author_id] === undefined) map[comment.author_id] = 0
+            map[comment.author_id] += await this.evaluate(comment)
+        }))
+        return map
     }
 
     /**
@@ -74,12 +73,36 @@ class Comment {
     /**
      * @param {string} author_id
      * @param {string} text
-     * @param {Number} like_count
+     * @param {number} like_count
      */
     constructor(author_id, text, like_count) {
         this.author_id = author_id
         this.text = text
         this.like_count = like_count
+    }
+
+    /**
+     * Checks if the comment author has subscribed to `to_channel`
+     * Only works if the user's subscriptions are public
+     * @param {string} to_channel channel id
+     * @param {UserCounter} counter the counter with a valid API token
+     * @returns {Promise<boolean>} true = subscribed, false = not subscribed, rejects on users with private subscriptions
+     */
+    isSubscribed(to_channel, counter) {
+        if(!counter[to_channel]) counter[to_channel] = {}
+        return new Promise((resolve, reject) => {
+            if(counter.subscribed[to_channel]?.[this.author_id] === undefined) {
+                counter.client.subscriptions.list({
+                    part: [ "id" ],
+                    channelId: this.author_id,
+                    forChannelId: to_channel,
+                    maxResults: 1
+                }).then(response => {
+                    counter.subscribed[to_channel][this.author_id] = response.data.items.length > 0
+                }).catch(err => reject(err))
+            }
+            resolve(counter.subscribed[to_channel][this.author_id])
+        })
     }
 }
 
