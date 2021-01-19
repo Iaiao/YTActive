@@ -14,13 +14,16 @@ let counter = new UserCounter(process.env.YTA_TOKEN, comment => new Promise((res
         resolve(n * (subscribed ? 2 : 1))
     }).catch(_ => resolve(n))
 }))
-counter.count("your_channel_id").then(comments => {
-    // { "commenter_channel_id": <points> }.
-    // Let's sort it so we will see the most active commenters.
-    let entries = Object.entries(comments)
-    entries.sort(function(a, b) {
-        return b[1] - a[1];
+counter.count("your_channel_id")
+    .then(comments => {
+        // { "commenter_channel_id": <points> }.
+        // Let's sort it so we will see the most active commenters.
+        let entries = Object.entries(comments)
+        entries.sort(function(a, b) {
+            return b[1] - a[1];
+        })
+        console.log(entries)
+    }).catch(err => {
+        console.error(err)
     })
-    console.log(entries)
-})
 ```

@@ -40,30 +40,34 @@ class UserCounter {
         let pageToken = null
         return new Promise(async (resolve, reject) => {
             let comments = []
-            do {
-                let response = await this.client.commentThreads.list({
+            let client = this.client
+            function loop() {
+                client.commentThreads.list({
                     part: [ "snippet", "replies" ],
                     allThreadsRelatedToChannelId: channel_id,
                     maxResults: 100,
                     pageToken
-                }).catch(err => reject(err))
-                response.data.items.forEach(item => {
-                    comments.push(new Comment(
-                        item.snippet.topLevelComment.snippet.authorChannelId.value,
-                        item.snippet.topLevelComment.snippet.textDisplay,
-                        item.snippet.topLevelComment.snippet.likeCount ?? 0
-                    ))
-                    item.replies?.comments?.forEach(item => {
+                }).then(response => {
+                    response.data.items.forEach(item => {
                         comments.push(new Comment(
-                            item.snippet.authorChannelId.value,
-                            item.snippet.textDisplay,
-                            item.snippet.likeCount ?? 0
+                            item.snippet.topLevelComment.snippet.authorChannelId.value,
+                            item.snippet.topLevelComment.snippet.textDisplay,
+                            item.snippet.topLevelComment.snippet.likeCount ?? 0
                         ))
+                        item.replies?.comments?.forEach(item => {
+                            comments.push(new Comment(
+                                item.snippet.authorChannelId.value,
+                                item.snippet.textDisplay,
+                                item.snippet.likeCount ?? 0
+                            ))
+                        })
                     })
-                })
-                pageToken = response.data.nextPageToken
-            } while(pageToken != null)
-            resolve(comments)
+                    pageToken = response.data.nextPageToken
+                    if(!pageToken) resolve(comments)
+                    else loop()
+                }).catch(err => reject(err))
+            }
+            loop()
         })
     }
 
