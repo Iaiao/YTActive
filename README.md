@@ -1,3 +1,5 @@
+[![NPM](https://img.shields.io/npm/v/ytactive)](https://www.npmjs.com/package/ytactive)
+
 # YTActive
 Find your most active YouTube subscribers
 
