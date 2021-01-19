@@ -23,11 +23,9 @@ class UserCounter {
      */
     async count(channel_id) {
         const comments = await this.fetchComments(channel_id)
-        let map = {}
-        await Promise.all(comments.map(async comment => {
-            if (map[comment.author_id] === undefined) map[comment.author_id] = 0
-            map[comment.author_id] += await this.evaluate(comment)
-        }))
+        let map = {};
+        (await Promise.all(comments.map(async comment => [ comment.author_id, await this.evaluate(comment) ]))) // [[id, count]]
+            .forEach(([id, count]) => { if(!map[id]) map[id] = 0; map[id] += count })
         return map
     }
 
